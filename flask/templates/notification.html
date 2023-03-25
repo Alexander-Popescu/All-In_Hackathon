@@ -7,14 +7,14 @@
 {% endblock %}
 
 {% block content %}
-<form class="center-form">
+<form action="" method="POST" class="center-form">
     <div class="form-group">
       <label for="exampleFormControlInput1">Message Header</label>
-      <input type="header" class="form-control" id="exampleFormControlInput1" placeholder="Type Header Here">
+      <input type="header" name="header" class="form-control" id="exampleFormControlInput1" placeholder="Type Header Here">
     </div>
     <div class="form-group">
       <label for="exampleFormControlTextarea1">Message Body</label>
-      <textarea placeholder="Type Message Body Here" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+      <textarea placeholder="Type Message Body Here" name="body" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
