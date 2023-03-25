@@ -2,25 +2,23 @@
 {% block title %}Homepage{% endblock %}
 
 {% block header %}
-<h1 class="center-text"><b>Recent Alerts</b></h1>
+<h1 style="font-size: 70px; padding: 20px;" class="center-text"><b>Recent Alerts</b></h1>
+<p class="center-text" style="font-size: 20px; margin-bottom: -20px;" ><b><span style="color: #2e9acc">Blue</span> boxes represent standard notifications.</b></p>
+<p class="center-text" style="font-size: 20px; margin-bottom: -20px;" ><b><span style="color: #b6b312">Yellow</span> boxes represent requests for help, those who can provide it will be notified.</b></p>
+<p class="center-text" style="font-size: 20px; margin-bottom: 20px;" ><b><span style="color: #ff0000">Red</span> boxes represent emergency alerts, all will be notified.</b></p>
 {% endblock %}
 
 {% block content %}
 <div class="center-card">
-  <div style="margin-bottom: 10px;" class="card text-black border-info mb-3">
-    <div class="card-body">
-      This is some text within a card body.
+  {% for item in entries %}
+    <div style="margin-bottom: 10px;" class="card text-black border-{{item[2]}} mb-3">
+      <div class="card-header">
+        {{item[0]}}
+      </div>
+      <div class="card-body">
+        {{item[1]}}
+      </div>
     </div>
-  </div>
-  <div style="margin-bottom: 10px;"class="card text-black border-warning mb-3">
-    <div class="card-body">
-      This is some text within a card body.
-    </div>
-  </div>
-  <div style="margin-bottom: 10px;"class="card text-black border-danger mb-3">
-    <div class="card-body">
-      This is some text within a card body.
-    </div>
-  </div>
+  {% endfor %}
 </div>
 {% endblock %}

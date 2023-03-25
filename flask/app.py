@@ -1,5 +1,13 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
+from email.message import EmailMessage
+import ssl
+import smtplib
 import sqlite3
+from twilio.rest import Client
+import keys
+
+#twilio stuff
+client = Client(keys.account_sid, keys.auth_token)
 
 app = Flask(__name__)
 
@@ -7,10 +15,14 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
-    if request.method == "POST":
-        return render_template('index.html', content='Hello World')
-    else:
-        return render_template('index.html', content='Hello World')
+    connection = sqlite3.connect("database.db")
+    cursor = connection.cursor()
+    data = cursor.execute("select * from ALERTS")
+    entries = []
+    for entry in data:
+        entries.append(entry)
+    entries.reverse()
+    return render_template('index.html', entries=entries)
     
 @app.route('/add', methods=['GET', 'POST'])
 def add():
@@ -44,7 +56,7 @@ def add():
                 sqliteConnection.close()
                 print("The SQLite connection is closed")
 
-        return render_template('index.html', content='Hello World')
+        return redirect("/")
     else:
         return render_template('add.html', content='Hello World')
     
@@ -62,7 +74,7 @@ def notification():
             print(header)
             print(body)
 
-            cursor.execute(f"INSERT INTO ALERTS VALUES ('{header}', '{body}', 'notification')")
+            cursor.execute(f"INSERT INTO ALERTS VALUES ('{header}', '{body}', 'info')")
             sqliteConnection.commit()
             print("Record inserted successfully into ALERTS table ", cursor.rowcount)
             cursor.close()
@@ -73,7 +85,29 @@ def notification():
             if sqliteConnection:
                 sqliteConnection.close()
                 print("The SQLite connection is closed")
-        return render_template('index.html', content='Hello World')
+        #send messages to phone and email
+        connection = sqlite3.connect("database.db")
+        cursor = connection.cursor()
+        data = cursor.execute("select * from CONTACTS")
+        entries = []
+        for entry in data:
+            entries.append(entry)
+
+        for entry in entries:#loop over everyone in the contact list
+            #send email via Gmail
+            em = EmailMessage()
+            em['From'] = keys.email_sender
+            em['To'] = entry[0] #entry email
+            em.set_content(body)
+
+            #secure connection
+            context = ssl.create_default_context()
+
+            #login and send email using gmail server
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+                smtp.login(keys.email_sender, keys.email_password)
+                smtp.sendmail(keys.email_sender, entry[0], em.as_string())
+        return redirect("/")
     else:
         return render_template('notification.html', content='Hello World')
 
@@ -91,7 +125,7 @@ def help_request():
             print(header)
             print(body)
 
-            cursor.execute(f"INSERT INTO ALERTS VALUES ('{header}', '{body}', 'help_request')")
+            cursor.execute(f"INSERT INTO ALERTS VALUES ('{header}', '{body}', 'warning')")
             sqliteConnection.commit()
             print("Record inserted successfully into ALERTS table ", cursor.rowcount)
             cursor.close()
@@ -102,7 +136,35 @@ def help_request():
             if sqliteConnection:
                 sqliteConnection.close()
                 print("The SQLite connection is closed")
-        return render_template('index.html', content='Hello World')
+        #send messages to phone and email
+        connection = sqlite3.connect("database.db")
+        cursor = connection.cursor()
+        data = cursor.execute("select * from CONTACTS WHERE Helper=1 ")
+        entries = []
+        for entry in data:
+            entries.append(entry)
+
+        for entry in entries:#loop over everyone in the contact list
+            #send SMS via twilio
+            message = client.messages.create(
+                body=f"{header} {body}",
+                from_=keys.twilio_number,
+                to=f"+{entry[1]}"
+            )
+            #send email via Gmail
+            em = EmailMessage()
+            em['From'] = keys.email_sender
+            em['To'] = entry[0] #entry email
+            em.set_content(body)
+
+            #secure connection
+            context = ssl.create_default_context()
+
+            #login and send email using gmail server
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+                smtp.login(keys.email_sender, keys.email_password)
+                smtp.sendmail(keys.email_sender, entry[0], em.as_string())
+        return redirect("/")
     else:
         return render_template('help_request.html', content='Hello World')
 
@@ -120,7 +182,7 @@ def emergency():
             print(header)
             print(body)
 
-            cursor.execute(f"INSERT INTO ALERTS VALUES ('{header}', '{body}', 'emergency')")
+            cursor.execute(f"INSERT INTO ALERTS VALUES ('{header}', '{body}', 'danger')")
             sqliteConnection.commit()
             print("Record inserted successfully into ALERTS table ", cursor.rowcount)
             cursor.close()
@@ -131,8 +193,38 @@ def emergency():
             if sqliteConnection:
                 sqliteConnection.close()
                 print("The SQLite connection is closed")
-        return render_template('index.html', content='Hello World')
-        return render_template('index.html', content='Hello World')
+        
+        #send messages to phone and email
+        connection = sqlite3.connect("database.db")
+        cursor = connection.cursor()
+        data = cursor.execute("select * from CONTACTS")
+        entries = []
+        for entry in data:
+            entries.append(entry)
+
+        for entry in entries:#loop over everyone in the contact list
+            #send SMS via twilio
+            message = client.messages.create(
+                body=f"{header} {body}",
+                from_=keys.twilio_number,
+                to=f"+{entry[1]}"
+            )
+            #send email via Gmail
+            em = EmailMessage()
+            em['From'] = keys.email_sender
+            em['To'] = entry[0] #entry email
+            em.set_content(body)
+
+            #secure connection
+            context = ssl.create_default_context()
+
+            #login and send email using gmail server
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+                smtp.login(keys.email_sender, keys.email_password)
+                smtp.sendmail(keys.email_sender, entry[0], em.as_string())
+
+        print(message.body)
+        return redirect("/")
     else:
         return render_template('emergency.html', content='Hello World')
 
