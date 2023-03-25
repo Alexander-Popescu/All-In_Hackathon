@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Homepage{% endblock %}
 
+{% block header %}
+<h1 class="center-text"><b>Recent Alerts</b></h1>
+{% endblock %}
+
 {% block content %}
-<h1>Test</h1>
+<div class="center-card">
+  <div style="margin-bottom: 10px;" class="card text-black border-info mb-3">
+    <div class="card-body">
+      This is some text within a card body.
+    </div>
+  </div>
+  <div style="margin-bottom: 10px;"class="card text-black border-warning mb-3">
+    <div class="card-body">
+      This is some text within a card body.
+    </div>
+  </div>
+  <div style="margin-bottom: 10px;"class="card text-black border-danger mb-3">
+    <div class="card-body">
+      This is some text within a card body.
+    </div>
+  </div>
+</div>
 {% endblock %}

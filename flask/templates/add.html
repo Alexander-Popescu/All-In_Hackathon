@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Homepage{% endblock %}
+
+{% block header %}
+<h1 class="center-text"><b>Add a Contact</b></h1>
+<p class="center-text">Add yourself to the alert recipients list</p>
+{% endblock %}
+
+{% block content %}
+<form class="center-form">
+    <div class="form-group">
+      <label for="exampleInputEmail1">Email address</label>
+      <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+      <small id="emailHelp" class="form-text text-muted">You will recieve all alert levels to this email address</small>
+    </div>
+    <div class="form-group">
+      <label for="exampleInputphone1">Phone Number</label>
+      <input type="phonenumber" class="form-control" id="exampleInputphone1" placeholder="Enter Phone Number">
+      <small id="emailHelp" class="form-text text-muted">Phone communications will be reserved for emergency alerts</small>
+    </div>
+    <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1">Can Provide Help</label>
+      </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+{% endblock %}
